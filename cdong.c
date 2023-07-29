@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "deps/raylib.h"
 
-
-
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(450, 800, "CDong");
