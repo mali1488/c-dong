@@ -4,8 +4,6 @@
 void render_start_button() {
     int width = GetRenderWidth();
     int height = GetRenderHeight();
-    int buttonWidth = 100;
-    int buttonHeight = 25; 
     
     int margin = 5;
     int padding = 10;
@@ -19,6 +17,9 @@ void render_start_button() {
     };
     Vector2 mousePos = GetMousePosition();
     if (CheckCollisionPointRec(mousePos, button)) {
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            printf("Start game!\n");
+        }
         DrawRectangleRec(button, RAYWHITE);
     } else {
         DrawRectangleRec(button, GRAY);
@@ -26,14 +27,15 @@ void render_start_button() {
     DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, LIGHTGRAY);
 }
 
+void render_label(const char* text, int x, int y, int fontSize, Color c) {
+    int width = MeasureText(text, fontSize);
+    DrawText(text, x - width / 2, y, fontSize, c);
+}
+
 void render_game_title() {
     int width = GetRenderWidth();
     int height = GetRenderHeight();
-
-    const char* msg = "C-Dong";
-    int fontSize = 40;
-    int msgWidth = MeasureText(msg, fontSize);
-    DrawText(msg, width/2 - msgWidth/2, height/2 - fontSize, fontSize, LIGHTGRAY);
+    render_label("C-Dong", width/2, height/2 - 40, 40, LIGHTGRAY);
 }
 
 int main(void) {
@@ -44,8 +46,6 @@ int main(void) {
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        int width = GetRenderWidth();
-        int height = GetRenderHeight();
         {
             ClearBackground(BLACK);
             render_game_title();
