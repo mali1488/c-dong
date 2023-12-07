@@ -1,6 +1,41 @@
 #include <stdio.h>
 #include "deps/raylib.h"
 
+void render_start_button() {
+    int width = GetRenderWidth();
+    int height = GetRenderHeight();
+    int buttonWidth = 100;
+    int buttonHeight = 25; 
+    
+    int margin = 5;
+    int padding = 10;
+    const char* msg = "Start";
+    int msgWidth = MeasureText(msg, 20);
+    Rectangle button = {
+        .x = (width - msgWidth - padding) / 2,
+        .y = height / 2 + margin,
+        .width = msgWidth + padding,
+        .height = 20 + padding
+    };
+    Vector2 mousePos = GetMousePosition();
+    if (CheckCollisionPointRec(mousePos, button)) {
+        DrawRectangleRec(button, RAYWHITE);
+    } else {
+        DrawRectangleRec(button, GRAY);
+    }
+    DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, LIGHTGRAY);
+}
+
+void render_game_title() {
+    int width = GetRenderWidth();
+    int height = GetRenderHeight();
+
+    const char* msg = "C-Dong";
+    int fontSize = 40;
+    int msgWidth = MeasureText(msg, fontSize);
+    DrawText(msg, width/2 - msgWidth/2, height/2 - fontSize, fontSize, LIGHTGRAY);
+}
+
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(450, 800, "CDong");
@@ -13,9 +48,8 @@ int main(void) {
         int height = GetRenderHeight();
         {
             ClearBackground(BLACK);
-            const char* msg = "CDong";
-            int msgWidth = MeasureText(msg, 20);
-            DrawText(msg, width/2 - msgWidth/2, height/2, 20, LIGHTGRAY);
+            render_game_title();
+            render_start_button();
         }
         EndDrawing();
     }
