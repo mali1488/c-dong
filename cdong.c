@@ -3,11 +3,13 @@
 #include "deps/raylib.h"
 #include "common.h"
 
-#define PADDLE_WIDTH 125
-#define PADDLE_HEIGHT 15
+#define GAME_PADDLE_WIDTH 125
+#define GAME_PADDLE_HEIGHT 15
+#define GAME_BALL_RADIUS 10
 #define GAME_TITLE "C-Dong"
 #define COLOR_BACKGROUND BLACK
 #define COLOR_FOREGROUND RAYWHITE
+#define GAME_PADDLE_VELOCITY 2
 
 typedef struct {
     int x;
@@ -19,6 +21,10 @@ typedef struct {
 } Game;
 
 static bool gameStart = false;
+
+void game_start() {
+    gameStart = true;
+}
 
 void render_start_button() {
     const int width = GetRenderWidth();
@@ -37,7 +43,7 @@ void render_start_button() {
     Vector2 mousePos = GetMousePosition();
     if (CheckCollisionPointRec(mousePos, button)) {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            gameStart = true;
+            game_start();
         }
         DrawRectangleRec(button, COLOR_FOREGROUND);
     } else {
@@ -67,49 +73,57 @@ void render_menu() {
     EndDrawing();
 }
 
-void render_game(Game game) {
+void game_render_paddle(const int x, const int y) {
+    Rectangle paddle_rectangle = {
+        .x = x,
+        .y = y,
+        .width = GAME_PADDLE_WIDTH,
+        .height = GAME_PADDLE_HEIGHT
+    };
+    DrawRectangleRec(paddle_rectangle, COLOR_FOREGROUND);
+}
+
+void game_render_ball() {
+    DrawCircle(50, 50, GAME_BALL_RADIUS, COLOR_FOREGROUND);                              // Draw a color-filled circle
+}
+
+void game_render(Game game) {
     const int height = GetRenderHeight();
     const int paddle_margin = 10;
 
     BeginDrawing();
     {
         ClearBackground(COLOR_BACKGROUND);
-        Rectangle player_one = {
-            .x = game.player_one_paddle.x,
-            .y = 0 + paddle_margin,
-            .width = PADDLE_WIDTH,
-            .height = PADDLE_HEIGHT
-        };
-        DrawRectangleRec(player_one, COLOR_FOREGROUND);
-        Rectangle player_two = {
-            .x = game.player_two_paddle.x, 
-            .y = height - PADDLE_HEIGHT - paddle_margin, 
-            .width = PADDLE_WIDTH, 
-            .height = PADDLE_HEIGHT
-        };
-        DrawRectangleRec(player_two, COLOR_FOREGROUND);
+        game_render_paddle(game.player_one_paddle.x, 0 + paddle_margin);
+        game_render_paddle(game.player_two_paddle.x, height - GAME_PADDLE_HEIGHT - paddle_margin);
+        game_render_ball();
     }
     EndDrawing();
 }
 
-void update_game_state(Game *game) {
+void game_move_paddle_left(Paddle* paddle) {
+    const int x = paddle->x - GAME_PADDLE_VELOCITY;
+    paddle->x = MAX(x, 0);
+}
+
+void game_move_paddle_right(Paddle* paddle) {
     const int width = GetRenderWidth();
-    const int vel = 2;
+    const int x = paddle->x + GAME_PADDLE_VELOCITY;
+    paddle->x = MIN(x, width - GAME_PADDLE_WIDTH);
+}
+
+void game_update_state(Game *game) {
     if (IsKeyDown(KEY_LEFT)) {
-        const int x = game->player_one_paddle.x - vel;
-        game->player_one_paddle.x = MAX(x, 0);
+        game_move_paddle_left(&game->player_one_paddle);
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        const int x = game->player_one_paddle.x + vel;
-        game->player_one_paddle.x = MIN(x, width - PADDLE_WIDTH);
+        game_move_paddle_right(&game->player_one_paddle);
     }
     if (IsKeyDown(KEY_A)) {
-        const int x = game->player_two_paddle.x - vel;
-        game->player_two_paddle.x = MAX(x, 0);
+        game_move_paddle_left(&game->player_two_paddle);
     }
     if (IsKeyDown(KEY_D)) {
-        const int x = game->player_two_paddle.x + vel;
-        game->player_two_paddle.x = MIN(x, width - PADDLE_WIDTH);
+        game_move_paddle_right(&game->player_two_paddle);
     }
 }
 
@@ -120,11 +134,14 @@ int main(void) {
     
     while (!WindowShouldClose() && !gameStart) {
         render_menu();
+        if (IsKeyDown(KEY_S)) {
+            game_start();
+        }
     }
     Game game = {0};
     while (!WindowShouldClose()) {
-        update_game_state(&game);
-        render_game(game);
+        game_update_state(&game);
+        game_render(game);
     }
     CloseWindow();
     return 0;
