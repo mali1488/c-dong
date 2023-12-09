@@ -6,10 +6,12 @@
 #define GAME_PADDLE_WIDTH 125
 #define GAME_PADDLE_HEIGHT 15
 #define GAME_BALL_RADIUS 10
+#define GAME_BALL_VELOCITY 2
 #define GAME_TITLE "C-Dong"
+#define GAME_PADDLE_VELOCITY 2
+
 #define COLOR_BACKGROUND BLACK
 #define COLOR_FOREGROUND RAYWHITE
-#define GAME_PADDLE_VELOCITY 2
 
 typedef struct {
     int x;
@@ -18,6 +20,8 @@ typedef struct {
 typedef struct {
     Paddle player_one_paddle;
     Paddle player_two_paddle;
+    Vector2 ball_position;
+    Vector2 ball_velocity;
 } Game;
 
 static bool gameStart = false;
@@ -83,8 +87,8 @@ void game_render_paddle(const int x, const int y) {
     DrawRectangleRec(paddle_rectangle, COLOR_FOREGROUND);
 }
 
-void game_render_ball() {
-    DrawCircle(50, 50, GAME_BALL_RADIUS, COLOR_FOREGROUND);                              // Draw a color-filled circle
+void game_render_ball(Vector2 position) {
+    DrawCircle(position.x, position.y, GAME_BALL_RADIUS, COLOR_FOREGROUND);                              // Draw a color-filled circle
 }
 
 void game_render(Game game) {
@@ -96,7 +100,7 @@ void game_render(Game game) {
         ClearBackground(COLOR_BACKGROUND);
         game_render_paddle(game.player_one_paddle.x, 0 + paddle_margin);
         game_render_paddle(game.player_two_paddle.x, height - GAME_PADDLE_HEIGHT - paddle_margin);
-        game_render_ball();
+        game_render_ball(game.ball_position);
     }
     EndDrawing();
 }
@@ -125,6 +129,19 @@ void game_update_state(Game *game) {
     if (IsKeyDown(KEY_D)) {
         game_move_paddle_right(&game->player_two_paddle);
     }
+    game->ball_position.x += game->ball_velocity.x;
+    game->ball_position.y += game->ball_velocity.y;
+}
+
+Game game_init() {
+    Game game = {0};
+    int width = GetRenderWidth();
+    int height = GetRenderHeight();
+    game.ball_velocity.x = GAME_BALL_VELOCITY;
+    game.ball_velocity.y = GAME_BALL_VELOCITY;
+    game.ball_position.x = width / 2 - GAME_BALL_RADIUS / 2;
+    game.ball_position.y = height / 2 - GAME_BALL_RADIUS / 2;
+    return game;
 }
 
 int main(void) {
@@ -138,7 +155,7 @@ int main(void) {
             game_start();
         }
     }
-    Game game = {0};
+    Game game = game_init();
     while (!WindowShouldClose()) {
         game_update_state(&game);
         game_render(game);
