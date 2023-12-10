@@ -14,12 +14,8 @@
 #define COLOR_FOREGROUND RAYWHITE
 
 typedef struct {
-    int x;
-} Paddle;
-
-typedef struct {
-    Paddle player_one_paddle;
-    Paddle player_two_paddle;
+    Rectangle player_one_paddle;
+    Rectangle player_two_paddle;
     Vector2 ball_position;
     Vector2 ball_velocity;
 } Game;
@@ -77,14 +73,8 @@ void render_menu() {
     EndDrawing();
 }
 
-void game_render_paddle(const int x, const int y) {
-    Rectangle paddle_rectangle = {
-        .x = x,
-        .y = y,
-        .width = GAME_PADDLE_WIDTH,
-        .height = GAME_PADDLE_HEIGHT
-    };
-    DrawRectangleRec(paddle_rectangle, COLOR_FOREGROUND);
+void game_render_paddle(Rectangle paddle) {
+    DrawRectangleRec(paddle, COLOR_FOREGROUND);
 }
 
 void game_render_ball(Vector2 position) {
@@ -92,28 +82,25 @@ void game_render_ball(Vector2 position) {
 }
 
 void game_render(Game game) {
-    const int height = GetRenderHeight();
-    const int paddle_margin = 10;
-
     BeginDrawing();
     {
         ClearBackground(COLOR_BACKGROUND);
-        game_render_paddle(game.player_one_paddle.x, 0 + paddle_margin);
-        game_render_paddle(game.player_two_paddle.x, height - GAME_PADDLE_HEIGHT - paddle_margin);
+        game_render_paddle(game.player_one_paddle);
+        game_render_paddle(game.player_two_paddle);
         game_render_ball(game.ball_position);
     }
     EndDrawing();
 }
 
-void game_move_paddle_left(Paddle* paddle) {
-    const int x = paddle->x - GAME_PADDLE_VELOCITY;
-    paddle->x = MAX(x, 0);
+void game_move_paddle_left(Rectangle* rectangle) {
+    const int x = rectangle->x - GAME_PADDLE_VELOCITY;
+    rectangle->x = MAX(x, 0);
 }
 
-void game_move_paddle_right(Paddle* paddle) {
+void game_move_paddle_right(Rectangle* rectangle) {
     const int width = GetRenderWidth();
-    const int x = paddle->x + GAME_PADDLE_VELOCITY;
-    paddle->x = MIN(x, width - GAME_PADDLE_WIDTH);
+    const int x = rectangle->x + GAME_PADDLE_VELOCITY;
+    rectangle->x = MIN(x, width - GAME_PADDLE_WIDTH);
 }
 
 void game_update_state(Game *game) {
@@ -129,6 +116,12 @@ void game_update_state(Game *game) {
     if (IsKeyDown(KEY_D)) {
         game_move_paddle_right(&game->player_two_paddle);
     }
+    if (
+        CheckCollisionCircleRec(game->ball_position, GAME_BALL_RADIUS, game->player_one_paddle) ||
+        CheckCollisionCircleRec(game->ball_position, GAME_BALL_RADIUS, game->player_two_paddle)
+    ) {
+        game->ball_velocity.y *= -1 * 1.25;        
+    }
     game->ball_position.x += game->ball_velocity.x;
     game->ball_position.y += game->ball_velocity.y;
 }
@@ -137,10 +130,26 @@ Game game_init() {
     Game game = {0};
     int width = GetRenderWidth();
     int height = GetRenderHeight();
-    game.ball_velocity.x = GAME_BALL_VELOCITY;
-    game.ball_velocity.y = GAME_BALL_VELOCITY;
+    game.ball_velocity.x = 0;
+    game.ball_velocity.y = -GAME_BALL_VELOCITY;
     game.ball_position.x = width / 2 - GAME_BALL_RADIUS / 2;
     game.ball_position.y = height / 2 - GAME_BALL_RADIUS / 2;
+
+    const int paddle_margin = 10;
+    Rectangle player_one_paddle = {
+        .x = 0,
+        .y = paddle_margin,
+        .width = GAME_PADDLE_WIDTH,
+        .height = GAME_PADDLE_HEIGHT
+    };
+    game.player_one_paddle = player_one_paddle;
+     Rectangle player_two_paddle = {
+        .x = 0,
+        .y = height - paddle_margin - GAME_PADDLE_HEIGHT,
+        .width = GAME_PADDLE_WIDTH,
+        .height = GAME_PADDLE_HEIGHT
+    };
+    game.player_two_paddle = player_two_paddle;
     return game;
 }
 
