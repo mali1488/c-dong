@@ -1,17 +1,18 @@
+
 #include <stdio.h>
 #include <stdbool.h>
-#include "deps/raylib.h"
+#include "raylib.h"
 #include "common.h"
+#include "theme.h"
+
+#define CDONG_UI_IMPLEMENTATION
+#include "cdong_ui.h"
 
 #define GAME_PADDLE_WIDTH 125
 #define GAME_PADDLE_HEIGHT 15
 #define GAME_BALL_RADIUS 10
 #define GAME_BALL_VELOCITY (20/0.16)
-#define GAME_TITLE "C-Dong"
 #define GAME_PADDLE_VELOCITY 2
-
-#define COLOR_BACKGROUND BLACK
-#define COLOR_FOREGROUND RAYWHITE
 
 typedef struct {
     Rectangle player_one_paddle;
@@ -24,53 +25,6 @@ static bool gameStart = false;
 
 void game_start() {
     gameStart = true;
-}
-
-void render_start_button() {
-    const int width = GetRenderWidth();
-    const int height = GetRenderHeight();
-    
-    const int margin = 5;
-    const int padding = 10;
-    const char* msg = "Start";
-    const int msgWidth = MeasureText(msg, 20);
-    Rectangle button = {
-        .x = (width - msgWidth - padding) / 2,
-        .y = height / 2 + margin,
-        .width = msgWidth + padding,
-        .height = 20 + padding
-    };
-    Vector2 mousePos = GetMousePosition();
-    if (CheckCollisionPointRec(mousePos, button)) {
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            game_start();
-        }
-        DrawRectangleRec(button, COLOR_FOREGROUND);
-    } else {
-        DrawRectangleRec(button, GRAY);
-    }
-    DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, LIGHTGRAY);
-}
-
-void render_label(const char* text, int x, int y, int fontSize, Color c) {
-    const int width = MeasureText(text, fontSize);
-    DrawText(text, x - width / 2, y, fontSize, c);
-}
-
-void render_game_title() {
-    const int width = GetRenderWidth();
-    const int height = GetRenderHeight();
-    render_label(GAME_TITLE, width/2, height/2 - 40, 40, LIGHTGRAY);
-}
-
-void render_menu() {
-    BeginDrawing();
-    {
-        ClearBackground(BLACK);
-        render_game_title();
-        render_start_button();
-    }
-    EndDrawing();
 }
 
 void game_render_paddle(Rectangle paddle) {
@@ -169,8 +123,7 @@ int main(void) {
     SetTargetFPS(60);
     
     while (!WindowShouldClose() && !gameStart) {
-        render_menu();
-        if (IsKeyDown(KEY_S)) {
+        if (ui_start_menu() || IsKeyDown(KEY_S)) {
             game_start();
         }
     }
