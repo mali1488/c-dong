@@ -105,6 +105,8 @@ void game_move_paddle_right(Rectangle* rectangle) {
 
 void game_update_state(Game *game) {
     const float dt = GetFrameTime();
+    const int width = GetRenderWidth();
+    const int height = GetRenderHeight();
     if (IsKeyDown(KEY_LEFT)) {
         game_move_paddle_left(&game->player_one_paddle);
     }
@@ -117,35 +119,42 @@ void game_update_state(Game *game) {
     if (IsKeyDown(KEY_D)) {
         game_move_paddle_right(&game->player_two_paddle);
     }
-    game->ball_position.x += game->ball_velocity.x * dt;
-    game->ball_position.y += game->ball_velocity.y * dt;
     if (
         CheckCollisionCircleRec(game->ball_position, GAME_BALL_RADIUS, game->player_one_paddle) ||
         CheckCollisionCircleRec(game->ball_position, GAME_BALL_RADIUS, game->player_two_paddle)
     ) {
         game->ball_velocity.y *= -1 * 1.25;
     }
+    if (game->ball_position.x - GAME_BALL_RADIUS < 0 || game->ball_position.x + GAME_BALL_RADIUS > width) {
+        game->ball_velocity.x *= -1;
+    }
+    if (game->ball_position.y - GAME_BALL_RADIUS < 0 || game->ball_position.y + GAME_BALL_RADIUS > height) {
+        game->ball_velocity.y *= -1;
+    }
+    game->ball_position.x += game->ball_velocity.x * dt;
+    game->ball_position.y += game->ball_velocity.y * dt;
 }
 
 Game game_init() {
     Game game = {0};
     int width = GetRenderWidth();
     int height = GetRenderHeight();
-    game.ball_velocity.x = 0;
+    game.ball_velocity.x = 100;
     game.ball_velocity.y = -GAME_BALL_VELOCITY;
     game.ball_position.x = width / 2 - GAME_BALL_RADIUS / 2;
     game.ball_position.y = height / 2 - GAME_BALL_RADIUS / 2;
 
+    const float player_x_pos = width / 2 - GAME_PADDLE_WIDTH / 2;
     const int paddle_margin = 10;
     Rectangle player_one_paddle = {
-        .x = 150,
+        .x = player_x_pos,
         .y = paddle_margin,
         .width = GAME_PADDLE_WIDTH,
         .height = GAME_PADDLE_HEIGHT
     };
     game.player_one_paddle = player_one_paddle;
      Rectangle player_two_paddle = {
-        .x = 150,
+        .x = player_x_pos,
         .y = height - paddle_margin - GAME_PADDLE_HEIGHT,
         .width = GAME_PADDLE_WIDTH,
         .height = GAME_PADDLE_HEIGHT
