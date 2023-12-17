@@ -4,7 +4,6 @@
 #include "raylib.h"
 #include "common.h"
 #include "theme.h"
-#include <string.h>
 
 #define CDONG_GAME_IMPLEMENTATION
 #include "cdong_game.h"
