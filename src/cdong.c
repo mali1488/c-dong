@@ -202,6 +202,5 @@ int main(void) {
 }
 
 // TODO
-// - Better controls (faster movement of paddels?
 // - New vector when ball collide with paddle
 // - Make game size independent
