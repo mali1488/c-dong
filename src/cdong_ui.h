@@ -1,10 +1,17 @@
+#include <stdio.h>
+#include <stdbool.h>
 #include "raylib.h"
 #include "theme.h"
-#include <stdbool.h>
 
 bool ui_start_menu();
 
 #ifdef CDONG_UI_IMPLEMENTATION
+
+int _render_label(const char* text, int x, int y, int font_size, Color c) {
+    const int width = MeasureText(text, font_size);
+    DrawText(text, x - width / 2, y, font_size, c);
+    return width;
+}
 
 bool _render_start_button() {
     const int width = GetRenderWidth();
@@ -32,11 +39,6 @@ bool _render_start_button() {
     }
     DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, LIGHTGRAY);
     return mousePressed;
-}
-
-void _render_label(const char* text, int x, int y, int fontSize, Color c) {
-    const int width = MeasureText(text, fontSize);
-    DrawText(text, x - width / 2, y, fontSize, c);
 }
 
 void _render_game_title() {

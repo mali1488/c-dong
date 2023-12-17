@@ -20,8 +20,13 @@ typedef struct {
 } Ball;
 
 typedef struct {
-    Rectangle player_one_paddle;
-    Rectangle player_two_paddle;
+    Rectangle paddle;
+    int score;
+} Player;
+
+typedef struct {
+    Player player_one;
+    Player player_two;
     Ball ball;
 } Game;
 
@@ -55,20 +60,26 @@ Game game_init() {
 
     const float player_x_pos = width / 2 - GAME_PADDLE_WIDTH / 2;
     const int paddle_margin = 10;
-    Rectangle player_one_paddle = {
-        .x = player_x_pos,
-        .y = paddle_margin,
-        .width = GAME_PADDLE_WIDTH,
-        .height = GAME_PADDLE_HEIGHT
+    Player player_two = {
+        .paddle = {
+            .x = player_x_pos,
+            .y = paddle_margin,
+            .width = GAME_PADDLE_WIDTH,
+            .height = GAME_PADDLE_HEIGHT
+        },
+        .score = 0
     };
-    game.player_one_paddle = player_one_paddle;
-     Rectangle player_two_paddle = {
-        .x = player_x_pos,
-        .y = height - paddle_margin - GAME_PADDLE_HEIGHT,
-        .width = GAME_PADDLE_WIDTH,
-        .height = GAME_PADDLE_HEIGHT
+    Player player_one = {
+        .paddle = {
+            .x = player_x_pos,
+            .y = height - paddle_margin - GAME_PADDLE_HEIGHT,
+            .width = GAME_PADDLE_WIDTH,
+            .height = GAME_PADDLE_HEIGHT
+        },
+        .score = 0
     };
-    game.player_two_paddle = player_two_paddle;
+    game.player_one = player_one;
+    game.player_two = player_two;
     return game;
 }
 
@@ -80,13 +91,44 @@ void game_render_ball(Vector2 position) {
     DrawCircle(position.x, position.y, GAME_BALL_RADIUS, COLOR_FOREGROUND);                              // Draw a color-filled circle
 }
 
+void game_render_score(int player_one, int player_two) {
+    const int width = GetRenderWidth();
+    const int height = GetRenderHeight();
+    char buff[16];
+    const int y = height/2 - 20;
+    const int font_size = 40;
+    const int margin = 10;
+
+    sprintf(buff, "%d", player_one);
+    MeasureText(buff, font_size);
+    DrawText(buff, 0 + margin, y - font_size, font_size, LIGHTGRAY);
+
+    sprintf(buff, "%d", player_two);
+    const int w_2 = MeasureText(buff, font_size);
+    _render_label(buff, width - w_2 - margin, y + font_size, font_size, LIGHTGRAY);
+}
+
+void game_render_playing_field() {
+    const int y = GetRenderHeight() / 2;
+    const int w = GetRenderWidth();
+    const int line_width = 10;
+    const int margin = 5;
+    for (int i = 1; i <= w; i++) {
+        const start = (i - 1) * line_width;
+        const end = i * line_width;
+        DrawLine(start, y, end - margin, y, LIGHTGRAY);
+    }
+}
+
 void game_render(Game game) {
     BeginDrawing();
     {
         ClearBackground(COLOR_BACKGROUND);
-        game_render_paddle(game.player_one_paddle);
-        game_render_paddle(game.player_two_paddle);
+        game_render_paddle(game.player_one.paddle);
+        game_render_paddle(game.player_two.paddle);
         game_render_ball(game.ball.position);
+        game_render_score(game.player_one.score, game.player_two.score);
+        game_render_playing_field();
     }
     EndDrawing();
 }
@@ -107,20 +149,20 @@ void game_update_state(Game *game) {
     const int width = GetRenderWidth();
     const int height = GetRenderHeight();
     if (IsKeyDown(KEY_LEFT)) {
-        game_move_paddle_left(&game->player_one_paddle);
+        game_move_paddle_left(&game->player_one.paddle);
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        game_move_paddle_right(&game->player_one_paddle);
+        game_move_paddle_right(&game->player_one.paddle);
     }
     if (IsKeyDown(KEY_A)) {
-        game_move_paddle_left(&game->player_two_paddle);
+        game_move_paddle_left(&game->player_two.paddle);
     }
     if (IsKeyDown(KEY_D)) {
-        game_move_paddle_right(&game->player_two_paddle);
+        game_move_paddle_right(&game->player_two.paddle);
     }
     if (
-        CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_one_paddle) ||
-        CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_two_paddle)
+        CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_one.paddle) ||
+        CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_two.paddle)
     ) {
         game->ball.velocity.y *= -1 * 1.25;
     }
@@ -128,8 +170,10 @@ void game_update_state(Game *game) {
         game->ball.velocity.x *= -1;
     }
     if (game->ball.position.y - GAME_BALL_RADIUS < 0) {
+        game->player_two.score += 1;
         game->ball = game_init_ball(false);
     } else if (game->ball.position.y + GAME_BALL_RADIUS > height) {
+        game->player_one.score += 1;
         game->ball = game_init_ball(true);
     }
     game->ball.position.x += game->ball.velocity.x * dt;
@@ -156,6 +200,5 @@ int main(void) {
 }
 
 // TODO
-// - Labels for score
 // - Better controls (faster movement of paddels?
 // - New vector when ball collide with paddle
