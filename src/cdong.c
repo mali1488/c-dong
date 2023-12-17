@@ -146,22 +146,10 @@ void game_move_paddle_right(Rectangle* rectangle) {
     rectangle->x = MIN(x, width - GAME_PADDLE_WIDTH);
 }
 
-void game_update_state(Game *game) {
+void game_update_ball_state(Game *game) {
     const float dt = GetFrameTime();
     const int width = GetRenderWidth();
     const int height = GetRenderHeight();
-    if (IsKeyDown(KEY_LEFT)) {
-        game_move_paddle_left(&game->player_one.paddle);
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-        game_move_paddle_right(&game->player_one.paddle);
-    }
-    if (IsKeyDown(KEY_A)) {
-        game_move_paddle_left(&game->player_two.paddle);
-    }
-    if (IsKeyDown(KEY_D)) {
-        game_move_paddle_right(&game->player_two.paddle);
-    }
     if (
         CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_one.paddle) ||
         CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_two.paddle)
@@ -180,6 +168,26 @@ void game_update_state(Game *game) {
     }
     game->ball.position.x += game->ball.velocity.x * dt;
     game->ball.position.y += game->ball.velocity.y * dt;
+}
+
+void game_update_player_state(Game *game) {
+    if (IsKeyDown(KEY_LEFT)) {
+        game_move_paddle_left(&game->player_one.paddle);
+    }
+    if (IsKeyDown(KEY_RIGHT)) {
+        game_move_paddle_right(&game->player_one.paddle);
+    }
+    if (IsKeyDown(KEY_A)) {
+        game_move_paddle_left(&game->player_two.paddle);
+    }
+    if (IsKeyDown(KEY_D)) {
+        game_move_paddle_right(&game->player_two.paddle);
+    }
+}
+
+void game_update_state(Game *game) {
+    game_update_player_state(game);
+    game_update_ball_state(game);
 }
 
 int main(void) {
@@ -202,5 +210,6 @@ int main(void) {
 }
 
 // TODO
+// - Holding button should make paddles go faster
 // - New vector when ball collide with paddle
 // - Make game size independent
