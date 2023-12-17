@@ -11,11 +11,7 @@
 #define CDONG_UI_IMPLEMENTATION
 #include "cdong_ui.h"
 
-static bool gameStart = false;
-
-void game_start() {
-    gameStart = true;
-}
+static bool game_start = false;
 
 void game_render_paddle(Rectangle paddle) {
     DrawRectangleRec(paddle, COLOR_FOREGROUND);
@@ -72,9 +68,9 @@ int main(void) {
     InitWindow(450, 800, GAME_TITLE);
     SetTargetFPS(FPS);
     
-    while (!WindowShouldClose() && !gameStart) {
+    while (!WindowShouldClose() && !game_start) {
         if (ui_start_menu() || IsKeyDown(KEY_S)) {
-            game_start();
+            game_start = true;
         }
     }
     Game game = game_init();
