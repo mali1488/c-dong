@@ -114,8 +114,8 @@ void game_render_playing_field() {
     const int line_width = 10;
     const int margin = 5;
     for (int i = 1; i <= w; i++) {
-        const start = (i - 1) * line_width;
-        const end = i * line_width;
+        const int start = (i - 1) * line_width;
+        const int end = i * line_width;
         DrawLine(start, y, end - margin, y, LIGHTGRAY);
     }
 }
