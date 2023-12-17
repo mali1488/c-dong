@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "common.h"
 #include "theme.h"
+#include <string.h>
 
 #define CDONG_GAME_IMPLEMENTATION
 #include "cdong_game.h"
@@ -24,16 +25,16 @@ void game_render_ball(Vector2 position) {
 void game_render_score(int player_one, int player_two) {
     const int width = GetRenderWidth();
     const int height = GetRenderHeight();
-    char buff[16];
     const int y = height/2 - 20;
     const int font_size = 40;
     const int margin = 10;
 
-    sprintf(buff, "%d", player_one);
+    char buff[128];
+    int_to_char(player_one, buff);
     MeasureText(buff, font_size);
     DrawText(buff, 0 + margin, y - font_size, font_size, LIGHTGRAY);
 
-    sprintf(buff, "%d", player_two);
+    int_to_char(player_two, buff);
     const int w_2 = MeasureText(buff, font_size);
     DrawText(buff, width - w_2 - margin, y + font_size, font_size, LIGHTGRAY);
 }
