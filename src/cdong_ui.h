@@ -29,22 +29,26 @@ bool _render_start_button() {
     };
     Vector2 mousePos = GetMousePosition();
     bool mousePressed = false;
+    Color background_color = COLOR_FOREGROUND;
+    Color text_color = BLACK;
     if (CheckCollisionPointRec(mousePos, button)) {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             mousePressed = true;
         }
-        DrawRectangleRec(button, COLOR_FOREGROUND);
-    } else {
-        DrawRectangleRec(button, GRAY);
+        background_color = BLACK;
+        text_color = COLOR_FOREGROUND;
     }
-    DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, LIGHTGRAY);
+    DrawRectangleRec(button, background_color);
+    DrawText(msg, (width - msgWidth) / 2, (height + padding) / 2 + margin, 20, text_color);
     return mousePressed;
 }
 
 void _render_game_title() {
     const int width = GetRenderWidth();
     const int height = GetRenderHeight();
-    _render_label(GAME_TITLE, width/2, height/2 - 40, 40, LIGHTGRAY);
+    const int font_size = 40;
+    const int w = MeasureText(GAME_TITLE, font_size);
+    DrawText(GAME_TITLE, width / 2 - w / 2, height / 2 - font_size, font_size, COLOR_FOREGROUND);
 }
 
 bool ui_start_menu() {

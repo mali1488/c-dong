@@ -11,8 +11,8 @@
 #define GAME_PADDLE_WIDTH 125
 #define GAME_PADDLE_HEIGHT 15
 #define GAME_BALL_RADIUS 10
-#define GAME_BALL_VELOCITY (20/0.16)
-#define GAME_PADDLE_VELOCITY 2
+#define GAME_BALL_VELOCITY (25/0.16)
+#define GAME_PADDLE_VELOCITY (70/0.16)
 
 typedef struct {
     Vector2 position;
@@ -105,7 +105,7 @@ void game_render_score(int player_one, int player_two) {
 
     sprintf(buff, "%d", player_two);
     const int w_2 = MeasureText(buff, font_size);
-    _render_label(buff, width - w_2 - margin, y + font_size, font_size, LIGHTGRAY);
+    DrawText(buff, width - w_2 - margin, y + font_size, font_size, LIGHTGRAY);
 }
 
 void game_render_playing_field() {
@@ -134,13 +134,15 @@ void game_render(Game game) {
 }
 
 void game_move_paddle_left(Rectangle* rectangle) {
-    const int x = rectangle->x - GAME_PADDLE_VELOCITY;
+    const float dt = GetFrameTime();
+    const int x = rectangle->x - dt * GAME_PADDLE_VELOCITY;
     rectangle->x = MAX(x, 0);
 }
 
 void game_move_paddle_right(Rectangle* rectangle) {
     const int width = GetRenderWidth();
-    const int x = rectangle->x + GAME_PADDLE_VELOCITY;
+    const float dt = GetFrameTime();
+    const int x = rectangle->x + dt * GAME_PADDLE_VELOCITY;
     rectangle->x = MIN(x, width - GAME_PADDLE_WIDTH);
 }
 
@@ -202,3 +204,4 @@ int main(void) {
 // TODO
 // - Better controls (faster movement of paddels?
 // - New vector when ball collide with paddle
+// - Make game size independent
