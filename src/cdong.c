@@ -154,3 +154,8 @@ int main(void) {
     CloseWindow();
     return 0;
 }
+
+// TODO
+// - Labels for score
+// - Better controls (faster movement of paddels?
+// - New vector when ball collide with paddle
