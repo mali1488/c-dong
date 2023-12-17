@@ -70,7 +70,7 @@ void game_render(Game game) {
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(450, 800, GAME_TITLE);
-    SetTargetFPS(60);
+    SetTargetFPS(FPS);
     
     while (!WindowShouldClose() && !gameStart) {
         if (ui_start_menu() || IsKeyDown(KEY_S)) {

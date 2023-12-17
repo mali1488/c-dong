@@ -3,11 +3,12 @@
 #include "raylib.h"
 #include "theme.h"
 
+#define FPS 60.0
 #define GAME_PADDLE_WIDTH 125
 #define GAME_PADDLE_HEIGHT 15
 #define GAME_BALL_RADIUS 10
-#define GAME_BALL_VELOCITY (25/0.16)
-#define GAME_PADDLE_VELOCITY (70/0.16)
+#define GAME_BALL_VELOCITY (2.0/(1.0/FPS))
+#define GAME_PADDLE_VELOCITY (7.0/(1.0/FPS))
 
 
 typedef struct {
