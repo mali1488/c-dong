@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include "raylib.h"
 #include "theme.h"
 
@@ -32,31 +33,39 @@ void game_update_state(Game *game);
 
 #ifdef CDONG_GAME_IMPLEMENTATION
 
-void game_move_paddle_left(Rectangle* rectangle) {
+void game_move_paddle_left(Rectangle* rectangle, KeyboardKey speed_key) {
     const float dt = GetFrameTime();
-    const int x = rectangle->x - dt * GAME_PADDLE_VELOCITY;
+    float vel = GAME_PADDLE_VELOCITY;
+    if (IsKeyDown(speed_key)) {
+        vel *= 2;
+    }
+    const int x = rectangle->x - dt * vel;
     rectangle->x = MAX(x, 0);
 }
 
-void game_move_paddle_right(Rectangle* rectangle) {
+void game_move_paddle_right(Rectangle* rectangle, KeyboardKey speed_key) {
     const int width = GetRenderWidth();
     const float dt = GetFrameTime();
-    const int x = rectangle->x + dt * GAME_PADDLE_VELOCITY;
+    float vel = GAME_PADDLE_VELOCITY;
+    if (IsKeyDown(speed_key)) {
+        vel *= 2;
+    }
+    const int x = rectangle->x + dt * vel;
     rectangle->x = MIN(x, width - GAME_PADDLE_WIDTH);
 }
 
 void game_update_player_state(Game *game) {
     if (IsKeyDown(KEY_LEFT)) {
-        game_move_paddle_left(&game->player_one.paddle);
+        game_move_paddle_left(&game->player_one.paddle, KEY_RIGHT_SHIFT);
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        game_move_paddle_right(&game->player_one.paddle);
+        game_move_paddle_right(&game->player_one.paddle, KEY_RIGHT_SHIFT);
     }
     if (IsKeyDown(KEY_A)) {
-        game_move_paddle_left(&game->player_two.paddle);
+        game_move_paddle_left(&game->player_two.paddle, KEY_LEFT_SHIFT);
     }
     if (IsKeyDown(KEY_D)) {
-        game_move_paddle_right(&game->player_two.paddle);
+        game_move_paddle_right(&game->player_two.paddle, KEY_LEFT_SHIFT);
     }
 }
 
@@ -84,7 +93,10 @@ void game_update_ball_state(Game *game) {
         CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_one.paddle) ||
         CheckCollisionCircleRec(game->ball.position, GAME_BALL_RADIUS, game->player_two.paddle)
     ) {
-        game->ball.velocity.y *= -1 * 1.25;
+        game->ball.velocity.y *= -1;
+        if (fabs(game->ball.velocity.y) < 1000) { 
+            game->ball.velocity.y *= 1.25;
+        }
     }
     if (game->ball.position.x - GAME_BALL_RADIUS < 0 || game->ball.position.x + GAME_BALL_RADIUS > width) {
         game->ball.velocity.x *= -1;
