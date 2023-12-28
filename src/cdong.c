@@ -13,17 +13,18 @@
 
 static bool game_start = false;
 
-void game_render_paddle(Rectangle paddle) {
-    DrawRectangleRec(paddle, COLOR_FOREGROUND);
+void game_render_paddle(float x_pos, bool upper_player) {
+    Rectangle rect = paddle_rect(x_pos, upper_player);
+    DrawRectangleRec(rect, COLOR_FOREGROUND);
 }
 
 void game_render_ball(Vector2 position) {
-    DrawCircle(position.x, position.y, GAME_BALL_RADIUS, COLOR_FOREGROUND);                              // Draw a color-filled circle
+    DrawCircle(position.x, position.y, game_ball_radius(), COLOR_FOREGROUND);                              // Draw a color-filled circle
 }
 
 void game_render_score(int player_one, int player_two) {
-    const int width = GetRenderWidth();
-    const int height = GetRenderHeight();
+    const int width = GetScreenWidth();
+    const int height = GetScreenHeight();
     const int y = height/2 - 20;
     const int font_size = 40;
     const int margin = 10;
@@ -39,8 +40,8 @@ void game_render_score(int player_one, int player_two) {
 }
 
 void game_render_playing_field() {
-    const int y = GetRenderHeight() / 2;
-    const int w = GetRenderWidth();
+    const int y = GetScreenHeight() / 2;
+    const int w = GetScreenWidth();
     const int line_width = 10;
     const int margin = 5;
     for (int i = 1; i <= w; i++) {
@@ -54,8 +55,8 @@ void game_render(Game game) {
     BeginDrawing();
     {
         ClearBackground(COLOR_BACKGROUND);
-        game_render_paddle(game.player_one.paddle);
-        game_render_paddle(game.player_two.paddle);
+        game_render_paddle(game.player_one.x_position, true);
+        game_render_paddle(game.player_two.x_position, false);
         game_render_ball(game.ball.position);
         game_render_score(game.player_one.score, game.player_two.score);
         game_render_playing_field();
@@ -81,5 +82,3 @@ int main(void) {
     CloseWindow();
     return 0;
 }
-
-// TODO: New vector when ball collide with paddle

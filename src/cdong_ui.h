@@ -14,8 +14,8 @@ int _render_label(const char* text, int x, int y, int font_size, Color c) {
 }
 
 bool _render_start_button() {
-    const int width = GetRenderWidth();
-    const int height = GetRenderHeight();
+    const int width = GetScreenWidth();
+    const int height = GetScreenHeight();
     
     const int margin = 5;
     const int padding = 10;
@@ -44,8 +44,8 @@ bool _render_start_button() {
 }
 
 void _render_game_title() {
-    const int width = GetRenderWidth();
-    const int height = GetRenderHeight();
+    const int width = GetScreenWidth();
+    const int height = GetScreenHeight();
     const int font_size = 40;
     const int w = MeasureText(GAME_TITLE, font_size);
     DrawText(GAME_TITLE, width / 2 - w / 2, height / 2 - font_size, font_size, COLOR_FOREGROUND);
