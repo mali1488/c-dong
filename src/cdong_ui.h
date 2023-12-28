@@ -23,7 +23,7 @@ bool render_start_button() {
     const int msg_width = MeasureText(msg, font_size);
     const float rect_pos_y = height / 2 + margin;
     const float rect_pos_x = (width - msg_width) / 2;
-    const padding = msg_width * 0.1;
+    const float padding = msg_width * 0.1;
     
     Rectangle button = {
         .x = rect_pos_x,
@@ -48,10 +48,10 @@ bool render_start_button() {
 }
 
 void render_game_title() {
-    const int width = GetScreenWidth();
-    const int height = GetScreenHeight();
-    const int font_size = width * 0.1;
-    const int w = MeasureText(GAME_TITLE, font_size);
+    const float width = GetScreenWidth();
+    const float height = GetScreenHeight();
+    const float font_size = width * 0.1;
+    const float w = MeasureText(GAME_TITLE, font_size);
     DrawText(GAME_TITLE, width / 2 - w / 2, height / 2 - font_size, font_size, COLOR_FOREGROUND);
 }
 

@@ -23,20 +23,19 @@ void game_render_ball(Vector2 position) {
 }
 
 void game_render_score(int player_one, int player_two) {
-    const int width = GetScreenWidth();
-    const int height = GetScreenHeight();
-    const int y = height/2 - 20;
-    const int font_size = 40;
-    const int margin = 10;
+    const float width = GetScreenWidth();
+    const float height = GetScreenHeight();
+    const float middle_y = height / 2;
+    const float font_size = width * 0.1;
+    const float padding = width * 0.03;
 
     char buff[128];
     int_to_char(player_one, buff);
-    MeasureText(buff, font_size);
-    DrawText(buff, 0 + margin, y - font_size, font_size, LIGHTGRAY);
+    DrawText(buff, 0 + padding, middle_y - font_size - padding, font_size, LIGHTGRAY);
 
     int_to_char(player_two, buff);
-    const int w_2 = MeasureText(buff, font_size);
-    DrawText(buff, width - w_2 - margin, y + font_size, font_size, LIGHTGRAY);
+    const float w2 = MeasureText(buff, font_size);
+    DrawText(buff, width - w2 - padding, middle_y + padding, font_size, LIGHTGRAY);
 }
 
 void game_render_playing_field() {
@@ -67,6 +66,7 @@ void game_render(Game game) {
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(450, 800, GAME_TITLE);
+    SetWindowMinSize(200, 400);
     SetTargetFPS(FPS);
     
     while (!WindowShouldClose() && !game_start) {
