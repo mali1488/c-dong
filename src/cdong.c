@@ -82,8 +82,4 @@ int main(void) {
     return 0;
 }
 
-// TODO
-// - Holding button should make paddles go faster
-// - New vector when ball collide with paddle
-// - Make game size independent
-
+// TODO: New vector when ball collide with paddle
